@@ -29,7 +29,7 @@ Word.prototype.guess = function(charGuess){
 
 Word.prototype.isDone = function(charGuess){
     for(var i=0; i< this.letters.length;i++){
-        console.log(this.letters[i]);
+        // console.log(this.letters[i]);
         if(this.letters[i].guessed){
             // console.log("letter is guessed")
         }else{

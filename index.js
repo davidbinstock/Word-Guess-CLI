@@ -1,14 +1,18 @@
 var inquirer = require("inquirer");
 var Word = require("./word");
 
-var wordBank = ["Thesaurus", "Igloo", ""]
+var wordBank = ["Thesaurus", "Igloo", "French Toast"]
 //================================================================
-currentWord = new Word("French Toast")
+var guessesPerWord = 5
+var currentWord;
+var usedWordIndexArray = [];
+var outOfWords = false;
 
 //================================================================
 console.log("============================")
 console.log("   WELCOME TO WORD GUESS")
 console.log("============================")
+newWord();
 mainMenu();
 
 function mainMenu(){
@@ -55,12 +59,32 @@ function guessLetter(){
             guessLetter();
             return;
         }
+
         console.log("you guessed: "+guess)
         if(currentWord.guess(guess)){
             console.log("Nice!! You guessed correctly!")
         }else{
             console.log("Whoops!! You guessed wrong!")
+            guessesLeft--;
         }
+
+        if(currentWord.isDone()||guessesLeft < 1){
+            if(currentWord.isDone()){
+                console.log("Nice! You Got the Word!!")
+            }else if(guessesLeft < 1){
+                console.log("Sorry you didn't get this word")
+            }
+            
+            newWord();
+
+            if(outOfWords){
+                console.log("------------------")
+                console.log("    Game Over")
+                console.log("------------------")
+                return;
+            }
+        }
+        console.log("Guesses Left: ", guessesLeft);
         guessLetter();
     })
 }
@@ -80,3 +104,44 @@ function isAlphabetic(char){
     //return result of test
     return singleAlphabetLetter.test(char);
 }
+
+function newWord(){
+    var newIndex = newUnusedRandIndex()
+    if(newIndex === false){
+        console.log("newWord: no more words");
+        outOfWords = true;
+        return false;
+    }
+    currentWord = new Word(wordBank[newIndex]);
+    guessesLeft=guessesPerWord;
+    return true;
+
+    
+}
+
+
+function newUnusedRandIndex(){
+    var unique = false;
+    var randomIndex;
+    //check if all words have been used, if so return false (otherwise while conditions would lead to infinite loop)
+    if(usedWordIndexArray.length == wordBank.length){
+        console.log("newUnusedRandIndex: all indeces in wordBank array were used")
+        return false;
+    }
+    //keep generating a random number untill one that wasn't used already is generated
+    while(!unique){
+        randomIndex = Math.floor(Math.random()*wordBank.length); 
+        // console.log("number: ", randomIndex);
+        // console.log("used array: ", usedWordIndexArray);     
+        if(usedWordIndexArray.indexOf(randomIndex)>= 0){
+            // console.log("Used, try again")
+        }else{
+            // console.log("cool this is a new number")
+            unique= true;
+        }
+    }
+    //return the new and "unique" index and push it to the usedWordIndexArray 
+    usedWordIndexArray.push(randomIndex);
+    return randomIndex;
+}
+
